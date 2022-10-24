@@ -21,8 +21,8 @@ class SinusParamsAdjuster(StrategyFactory):
         points: Optional[List[Point]] = None,
     ):
         self._params: Optional[SinParameters] = None
-        self.similarity: float
-        self.similarity_threshold = similarity_threshold
+        self.distance: float
+        self.distance_threshold = similarity_threshold
         self.points = get_random_points() if points is None else points
         self.adjusting_strategy = self.create_strategy(adjusting_strategy_type)
 
@@ -41,8 +41,8 @@ class SinusParamsAdjuster(StrategyFactory):
             self.adjusting_strategy.perform_algorithm()
             (
                 self._params,
-                self.similarity,
-            ) = self.adjusting_strategy.get_params_and_similarity()
+                self.distance,
+            ) = self.adjusting_strategy.get_params_and_distance()
 
         return self._params
 

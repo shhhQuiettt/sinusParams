@@ -5,7 +5,7 @@ from sinusParams.sinusParams import SinusParamsAdjuster
 def main():
     sinus_params_adjuster = SinusParamsAdjuster(
         adjusting_strategy_type="evolutionary",
-        similarity_threshold=0.25,
+        similarity_threshold=0.1,
     )
 
     sinus_adjuster_view = PlotView(sinus_params_adjuster)

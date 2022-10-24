@@ -48,4 +48,4 @@ class PlotView(SinAdjusterView):
 
     def print_params(self) -> None:
         print(f"Params: {self.adjuster.params}")
-        print(f"Similarity: {self.adjuster.similarity}")
+        print(f"Distance: {self.adjuster.distance}")

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 # from .sinusParams import SinusParamsAdjuster
 from .typing import SinParameters, SinWithParameters
 from random import random, randint, sample, shuffle, uniform
-from typing import Callable, List
+from typing import Callable, List, Tuple
 import math
 from . import helpers
 
@@ -22,7 +22,7 @@ class ParamsAdjustingStrategy(ABC):
         pass
 
     @abstractmethod
-    def get_params_and_similarity(self) -> tuple[SinParameters, float]:
+    def get_params_and_distance(self) -> tuple[SinParameters, float]:
         pass
 
     def set_adjuster(self) -> None:
@@ -30,14 +30,14 @@ class ParamsAdjustingStrategy(ABC):
 
 
 class StrategyFactory:
-    similarity_threshold: float
+    distance_threshold: float
 
     def create_strategy(self, strategy_type: str) -> ParamsAdjustingStrategy:
         match strategy_type:
             case "evolutionary":
                 return EvolutionaryStrategy(
                     self,
-                    similarity_threshold=self.similarity_threshold,
+                    similarity_threshold=self.distance_threshold,
                     population_number=200,
                 )
             case _:
@@ -54,12 +54,13 @@ class EvolutionaryStrategy(ParamsAdjustingStrategy):
         mutation_chance: float = 0.2,
     ):
         self.adjuster = adjuster
-        self.similarity = 0.000001
 
         self.similarity_threshold = similarity_threshold
         self.mutation_chance = mutation_chance
         self.params_list = self.get_random_params_population(population_number)
         self.sort_params_list_by_accuracy()
+
+        self.distance = self.points_to_graph_distance(self.params_list[0])
 
     @staticmethod
     def get_random_params_population(population_number: int) -> List[SinParameters]:
@@ -123,12 +124,12 @@ class EvolutionaryStrategy(ParamsAdjustingStrategy):
 
     def perform_algorithm(self) -> None:
         i = 0
-        while not self.similarity < self.similarity_threshold and i < 1_000:
+        while not self.distance < self.similarity_threshold and i < 10_000:
             self.remove_bottom_population_half()
             self.populate_missing_params()
             self.sort_params_list_by_accuracy()
-            self.similarity = 1 / self.points_to_graph_distance(self.params_list[0])
+            self.distance = self.points_to_graph_distance(self.params_list[0])
             i += 1
 
-    def get_params_and_similarity(self):
-        return self.params_list[0], self.similarity
+    def get_params_and_distance(self) -> Tuple[SinParameters, float]:
+        return self.params_list[0], self.distance
